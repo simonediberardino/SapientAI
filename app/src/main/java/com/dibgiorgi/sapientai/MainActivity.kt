@@ -3,6 +3,7 @@ package com.dibgiorgi.sapientai
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,16 +19,19 @@ import com.dibgiorgi.sapientai.ui.composables.AppTopBar
 import com.dibgiorgi.sapientai.ui.composables.ChatMessage
 import com.dibgiorgi.sapientai.ui.composables.UserChatMessage
 import com.dibgiorgi.sapientai.ui.theme.SapientAITheme
+import com.dibgiorgi.sapientai.ui.viewmodel.ChatViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SapientAITheme {
+                val viewmodel by viewModels<ChatViewModel>()
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = { AppTopBar() },
-                    bottomBar = { AppBottomBar()}
+                    bottomBar = { AppBottomBar(viewmodel) }
                 ) { innerPadding ->
                     LazyColumn(
                         Modifier
@@ -38,8 +42,8 @@ class MainActivity : ComponentActivity() {
                         item {
                             AIChatMessage(message = stringResource(R.string.home_intro_message))
                         }
-                        
-                        item { 
+
+                        item {
                             UserChatMessage(message = "Test message")
                         }
                     }

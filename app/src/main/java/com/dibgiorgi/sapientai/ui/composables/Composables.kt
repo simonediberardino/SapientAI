@@ -1,5 +1,6 @@
 package com.dibgiorgi.sapientai.ui.composables
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.dibgiorgi.sapientai.R
 import com.dibgiorgi.sapientai.ui.theme.SapientAITheme
 import com.dibgiorgi.sapientai.ui.theme.Title
+import com.dibgiorgi.sapientai.ui.viewmodel.ChatViewModel
 
 @Composable
 fun AppTopBar(
@@ -86,10 +90,14 @@ fun AppTopBar(
 }
 
 @Composable
-fun AppBottomBar() {
+fun AppBottomBar(
+    viewModel: ChatViewModel? = null
+) {
     val input = remember {
         mutableStateOf("")
     }
+
+    val context = LocalContext.current
 
     TextField(
         placeholder = {
@@ -115,16 +123,33 @@ fun AppBottomBar() {
         trailingIcon = {
             Row(
                 modifier = Modifier.padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Image(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {
+                            Toast.makeText(context, "Camera", Toast.LENGTH_SHORT).show()
+                        },
                     painter = painterResource(id = R.drawable.baseline_camera_alt_24),
                     contentDescription = "",
                     colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
                 )
 
                 Image(
+                    modifier = Modifier.size(32.dp).clickable {
+                        Toast.makeText(context, "Microphone", Toast.LENGTH_SHORT).show()
+                    },
                     painter = painterResource(id = R.drawable.baseline_mic_none_24),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
+                )
+
+                Image(
+                    modifier = Modifier.size(32.dp).clickable {
+                        viewModel?.input(input.value)
+                    },
+                    painter = painterResource(id = R.drawable.baseline_arrow_circle_right_24),
                     contentDescription = "",
                     colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
                 )
@@ -171,11 +196,13 @@ fun ChatMessage(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalArrangement = horizontal
-    ){
-        Box(modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.tertiary)
-            .padding(16.dp))
+    ) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.tertiary)
+                .padding(16.dp)
+        )
         {
             Text(
                 text = buildAnnotatedString {
@@ -207,7 +234,7 @@ fun AppBottomBarPreview() {
 
 @Preview()
 @Composable
-fun ChatMessagePreview(){
+fun ChatMessagePreview() {
     SapientAITheme {
         ChatMessage(author = "SapientAI", message = "Text Message", horizontal = Arrangement.Start)
     }
